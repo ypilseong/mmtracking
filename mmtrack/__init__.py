@@ -11,7 +11,7 @@ MMCV_MIN = '1.3.17'
 MMCV_MAX = '2.2.0'
 
 MMDET_MIN = '2.19.1'
-MMDET_MAX = '3.0.0'
+MMDET_MAX = '3.4.0'
 
 
 def digit_version(version_str: str, length: int = 4):
