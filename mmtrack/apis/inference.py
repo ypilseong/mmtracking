@@ -7,13 +7,12 @@ import mmcv
 import numpy as np
 import torch
 from mmcv.ops import RoIPool
-from mmengine.dataset import default_collate as collate 
-from mmcv.paralle import scatter
+from mmengine.dataset import default_collate as collate
 from mmcv.runner import load_checkpoint
 from mmdet.datasets.pipelines import Compose
 
 from mmtrack.models import build_model
-
+from mmengine.model.base_model import ImgDataPreprocessor  # 외부 모듈에서 불러옴
 
 def init_model(config,
                checkpoint=None,
@@ -79,7 +78,6 @@ def init_model(config,
     model.eval()
     return model
 
-
 def inference_mot(model, img, frame_id):
     """Inference image(s) with the mot model.
 
@@ -108,9 +106,14 @@ def inference_mot(model, img, frame_id):
     test_pipeline = Compose(cfg.data.test.pipeline)
     data = test_pipeline(data)
     data = collate([data], samples_per_gpu=1)
+    
+    preprocessor = ImgDataPreprocessor()
+    data = preprocessor(data)
+    
     if next(model.parameters()).is_cuda:
         # scatter to specified GPU
-        data = scatter(data, [device])[0]
+        data['inputs'] = data['inputs'].to(device)
+        data['img_metas'] = data['img_metas'].to(device)
     else:
         for m in model.modules():
             assert not isinstance(
@@ -147,9 +150,14 @@ def inference_sot(model, image, init_bbox, frame_id):
     test_pipeline = Compose(cfg.data.test.pipeline[2:])
     data = test_pipeline(data)
     data = collate([data], samples_per_gpu=1)
+    
+    preprocessor = ImgDataPreprocessor()
+    data = preprocessor(data)
+    
     if next(model.parameters()).is_cuda:
         # scatter to specified GPU
-        data = scatter(data, [device])[0]
+        data['inputs'] = data['inputs'].to(device)
+        data['img_metas'] = data['img_metas'].to(device)
     else:
         for m in model.modules():
             assert not isinstance(
@@ -223,9 +231,14 @@ def inference_vid(model,
 
     data = test_pipeline(data)
     data = collate([data], samples_per_gpu=1)
+    
+    preprocessor = ImgDataPreprocessor()
+    data = preprocessor(data)
+    
     if next(model.parameters()).is_cuda:
         # scatter to specified GPU
-        data = scatter(data, [device])[0]
+        data['inputs'] = data['inputs'].to(device)
+        data['img_metas'] = data['img_metas'].to(device)
     else:
         for m in model.modules():
             assert not isinstance(
