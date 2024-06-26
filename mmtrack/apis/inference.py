@@ -8,7 +8,7 @@ import numpy as np
 import torch
 from mmcv.ops import RoIPool
 from mmengine.dataset import default_collate as collate
-from mmcv.runner import load_checkpoint
+from mmengine.runner import load_checkpoint
 from mmdet.datasets.pipelines import Compose
 
 from mmtrack.models import build_model
