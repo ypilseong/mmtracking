@@ -9,7 +9,7 @@ import torch
 from mmcv.ops import RoIPool
 from mmengine.dataset import default_collate as collate
 from mmengine.runner import load_checkpoint
-from mmdet.datasets.pipelines import Compose
+from mmengine.dataset import Compose
 
 from mmtrack.models import build_model
 from mmengine.model.base_model import ImgDataPreprocessor  # 외부 모듈에서 불러옴
